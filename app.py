@@ -69,6 +69,14 @@ df = load_data(DATA_PATH)
 
 
 # ==================================================
+# FAVORITES / PLAYLIST
+# ==================================================
+
+if "favorites" not in st.session_state:
+    st.session_state.favorites = []
+
+
+# ==================================================
 # HEADER
 # ==================================================
 
@@ -117,11 +125,12 @@ st.sidebar.metric(
 # NAVIGATION
 # ==================================================
 
-home_tab, recommendation_tab, mood_tab, analytics_tab = st.tabs(
+home_tab, recommendation_tab, mood_tab, playlist_tab, analytics_tab = st.tabs(
     [
         "🏠 Home",
         "🎧 Recommendations",
         "🎭 Mood",
+        "❤️ My Playlist",
         "📊 Analytics"
     ]
 )
@@ -460,6 +469,37 @@ with recommendation_tab:
                     unsafe_allow_html=True
                 )
 
+    if st.button(
+        f"❤️ Add {song['title']}",
+        key=f"favorite_{song['title']}"
+    ):
+
+        song_data = {
+            "title": song["title"],
+            "artist": song["artist"],
+            "genre": song["genre"],
+            "year": song["year"]
+        }
+
+        # Avoid duplicates
+        if song["title"] not in [
+            item["title"]
+            for item in st.session_state.favorites
+        ]:
+
+            st.session_state.favorites.append(
+                song_data
+            )
+
+            st.success(
+                f"❤️ {song['title']} added to your playlist!"
+            )
+
+        else:
+
+            st.info(
+                "This song is already in your playlist."
+            )
 
 # ==================================================
 # MOOD TAB
@@ -550,7 +590,107 @@ with mood_tab:
                 unsafe_allow_html=True
             )
 
+# ==================================================
+# PLAYLIST TAB
+# ==================================================
 
+with playlist_tab:
+
+    st.header("❤️ My Playlist")
+
+    if not st.session_state.favorites:
+
+        st.info(
+            "Your playlist is empty. "
+            "Go to Recommendations and add some songs! 🎵"
+        )
+
+    else:
+
+        st.success(
+            f"You have "
+            f"{len(st.session_state.favorites)} "
+            f"song(s) in your playlist."
+        )
+
+        # ------------------------------------------
+        # DISPLAY PLAYLIST
+        # ------------------------------------------
+
+        for index, song in enumerate(
+            st.session_state.favorites
+        ):
+
+            col1, col2 = st.columns(
+                [5, 1]
+            )
+
+            with col1:
+
+                st.markdown(
+                    f"""
+                    <div class="song-card">
+
+                    <h3>
+                    🎵 {song['title']}
+                    </h3>
+
+                    <p>
+                    <b>Artist:</b>
+                    {song['artist']}
+                    </p>
+
+                    <p>
+                    <b>Genre:</b>
+                    {song['genre']}
+                    </p>
+
+                    <p>
+                    <b>Year:</b>
+                    {int(song['year'])}
+                    </p>
+
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+
+            with col2:
+
+                if st.button(
+                    "🗑️ Remove",
+                    key=f"remove_{index}"
+                ):
+
+                    st.session_state.favorites.pop(
+                        index
+                    )
+
+                    st.rerun()
+
+        # ------------------------------------------
+        # EXPORT PLAYLIST
+        # ------------------------------------------
+
+        st.divider()
+
+        playlist_df = pd.DataFrame(
+            st.session_state.favorites
+        )
+
+        csv_data = playlist_df.to_csv(
+            index=False
+        )
+
+        st.download_button(
+            label="💾 Download Playlist as CSV",
+            data=csv_data,
+            file_name="tunematch_playlist.csv",
+            mime="text/csv",
+            use_container_width=True
+        )
+
+        
 # ==================================================
 # ANALYTICS TAB
 # ==================================================
