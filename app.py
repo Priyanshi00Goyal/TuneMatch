@@ -542,3 +542,389 @@ st.write(
     acousticness, and valence.
     """
 )
+
+# ==================================================
+# MUSIC ANALYTICS DASHBOARD
+# ==================================================
+
+st.divider()
+
+st.header("📊 Music Analytics Dashboard")
+
+st.write(
+    "Explore patterns and trends across the TuneMatch dataset."
+)
+
+
+# ==================================================
+# DATASET STATISTICS
+# ==================================================
+
+st.subheader("📌 Dataset Overview")
+
+total_songs = len(df)
+
+total_artists = df["artist"].nunique()
+
+total_genres = df["genre"].nunique()
+
+average_energy = df["energy"].mean()
+
+average_danceability = df["danceability"].mean()
+
+
+col1, col2, col3, col4, col5 = st.columns(5)
+
+
+with col1:
+
+    st.metric(
+        "🎵 Songs",
+        total_songs
+    )
+
+
+with col2:
+
+    st.metric(
+        "🎤 Artists",
+        total_artists
+    )
+
+
+with col3:
+
+    st.metric(
+        "🎼 Genres",
+        total_genres
+    )
+
+
+with col4:
+
+    st.metric(
+        "⚡ Avg Energy",
+        round(
+            average_energy,
+            2
+        )
+    )
+
+
+with col5:
+
+    st.metric(
+        "💃 Avg Danceability",
+        round(
+            average_danceability,
+            2
+        )
+    )
+
+
+# ==================================================
+# GENRE DISTRIBUTION
+# ==================================================
+
+st.subheader("🎼 Genre Distribution")
+
+
+genre_counts = (
+    df["genre"]
+    .value_counts()
+)
+
+
+fig1, ax1 = plt.subplots()
+
+
+ax1.pie(
+    genre_counts.values,
+    labels=genre_counts.index,
+    autopct="%1.1f%%"
+)
+
+
+ax1.set_title(
+    "Songs by Genre"
+)
+
+
+st.pyplot(fig1)
+
+
+# ==================================================
+# ENERGY BY GENRE
+# ==================================================
+
+st.subheader(
+    "⚡ Average Energy by Genre"
+)
+
+
+energy_by_genre = (
+    df.groupby("genre")["energy"]
+    .mean()
+    .sort_values(
+        ascending=False
+    )
+)
+
+
+fig2, ax2 = plt.subplots()
+
+
+ax2.bar(
+    energy_by_genre.index,
+    energy_by_genre.values
+)
+
+
+ax2.set_ylabel(
+    "Average Energy"
+)
+
+
+ax2.set_ylim(
+    0,
+    1
+)
+
+
+ax2.set_title(
+    "Average Energy by Genre"
+)
+
+
+plt.xticks(
+    rotation=30
+)
+
+
+st.pyplot(fig2)
+
+
+# ==================================================
+# DANCEABILITY BY GENRE
+# ==================================================
+
+st.subheader(
+    "💃 Average Danceability by Genre"
+)
+
+
+danceability_by_genre = (
+    df.groupby("genre")["danceability"]
+    .mean()
+    .sort_values(
+        ascending=False
+    )
+)
+
+
+fig3, ax3 = plt.subplots()
+
+
+ax3.bar(
+    danceability_by_genre.index,
+    danceability_by_genre.values
+)
+
+
+ax3.set_ylabel(
+    "Average Danceability"
+)
+
+
+ax3.set_ylim(
+    0,
+    1
+)
+
+
+ax3.set_title(
+    "Average Danceability by Genre"
+)
+
+
+plt.xticks(
+    rotation=30
+)
+
+
+st.pyplot(fig3)
+
+
+# ==================================================
+# VALENCE BY GENRE
+# ==================================================
+
+st.subheader(
+    "😊 Average Valence by Genre"
+)
+
+
+valence_by_genre = (
+    df.groupby("genre")["valence"]
+    .mean()
+    .sort_values(
+        ascending=False
+    )
+)
+
+
+fig4, ax4 = plt.subplots()
+
+
+ax4.bar(
+    valence_by_genre.index,
+    valence_by_genre.values
+)
+
+
+ax4.set_ylabel(
+    "Average Valence"
+)
+
+
+ax4.set_ylim(
+    0,
+    1
+)
+
+
+ax4.set_title(
+    "Average Valence by Genre"
+)
+
+
+plt.xticks(
+    rotation=30
+)
+
+
+st.pyplot(fig4)
+
+
+# ==================================================
+# RELEASE YEAR DISTRIBUTION
+# ==================================================
+
+st.subheader(
+    "📅 Songs by Release Year"
+)
+
+
+year_counts = (
+    df["year"]
+    .value_counts()
+    .sort_index()
+)
+
+
+fig5, ax5 = plt.subplots()
+
+
+ax5.plot(
+    year_counts.index,
+    year_counts.values,
+    marker="o"
+)
+
+
+ax5.set_xlabel(
+    "Release Year"
+)
+
+
+ax5.set_ylabel(
+    "Number of Songs"
+)
+
+
+ax5.set_title(
+    "Songs in Dataset by Release Year"
+)
+
+
+st.pyplot(fig5)
+
+
+# ==================================================
+# TOP ENERGETIC SONGS
+# ==================================================
+
+st.subheader(
+    "⚡ Most Energetic Songs"
+)
+
+
+top_energy = (
+    df[
+        [
+            "title",
+            "artist",
+            "energy"
+        ]
+    ]
+    .sort_values(
+        by="energy",
+        ascending=False
+    )
+    .head(5)
+    .copy()
+)
+
+
+top_energy.columns = [
+    "Song",
+    "Artist",
+    "Energy"
+]
+
+
+st.dataframe(
+    top_energy,
+    use_container_width=True,
+    hide_index=True
+)
+
+
+# ==================================================
+# TOP DANCEABLE SONGS
+# ==================================================
+
+st.subheader(
+    "💃 Most Danceable Songs"
+)
+
+
+top_danceable = (
+    df[
+        [
+            "title",
+            "artist",
+            "danceability"
+        ]
+    ]
+    .sort_values(
+        by="danceability",
+        ascending=False
+    )
+    .head(5)
+    .copy()
+)
+
+
+top_danceable.columns = [
+    "Song",
+    "Artist",
+    "Danceability"
+]
+
+
+st.dataframe(
+    top_danceable,
+    use_container_width=True,
+    hide_index=True
+)
