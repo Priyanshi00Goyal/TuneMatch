@@ -5,7 +5,9 @@ import matplotlib.pyplot as plt
 from recommender import (
     load_data,
     get_recommendations,
-    get_mood_recommendations
+    get_mood_recommendations,
+    load_playlist,
+    save_playlist
 )
 
 
@@ -64,6 +66,7 @@ st.markdown(
 # ==================================================
 
 DATA_PATH = "data/songs.csv"
+PLAYLIST_PATH = "data/playlist.csv"
 
 df = load_data(DATA_PATH)
 
@@ -73,7 +76,10 @@ df = load_data(DATA_PATH)
 # ==================================================
 
 if "favorites" not in st.session_state:
-    st.session_state.favorites = []
+
+    st.session_state.favorites = load_playlist(
+        PLAYLIST_PATH
+    )
 
 
 # ==================================================
@@ -614,6 +620,11 @@ with recommendation_tab:
                                 song_data
                             )
 
+                            save_playlist(
+                                PLAYLIST_PATH,
+                                st.session_state.favorites
+                            )
+
                             st.success(
                                 f"❤️ {song['title']} added!"
                             )
@@ -787,6 +798,11 @@ with playlist_tab:
 
                     st.session_state.favorites.pop(
                         index
+                    )
+
+                    save_playlist(  
+                        PLAYLIST_PATH,
+                        st.session_state.favorites
                     )
 
                     st.rerun()
