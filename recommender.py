@@ -3,7 +3,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics.pairwise import cosine_similarity
 
 
-FEATURES = [
+# Audio features used by the recommendation engine
+AUDIO_FEATURES = [
     "danceability",
     "energy",
     "acousticness",
@@ -13,30 +14,41 @@ FEATURES = [
 
 
 def load_data(file_path):
-    """Load song data from CSV."""
+    """Load songs from CSV."""
+
     return pd.read_csv(file_path)
 
 
-def prepare_features(df):
-    """Prepare numerical song features for similarity calculation."""
+def prepare_audio_features(df):
+    """Standardize audio features."""
 
     scaler = StandardScaler()
 
-    feature_matrix = scaler.fit_transform(df[FEATURES])
+    features = scaler.fit_transform(
+        df[AUDIO_FEATURES]
+    )
 
-    return feature_matrix
+    return features
 
 
-def get_recommendations(df, song_title, number_of_recommendations=5):
-    """Return songs that are musically similar to the selected song."""
+def get_recommendations(
+    df,
+    song_title,
+    number_of_recommendations=5,
+    same_genre_only=False
+):
+    """
+    Recommend songs based on audio similarity,
+    genre and artist.
+    """
 
-    feature_matrix = prepare_features(df)
-
-    similarity_matrix = cosine_similarity(feature_matrix)
-
+    # ------------------------------------------
     # Find selected song
+    # ------------------------------------------
+
     matches = df.index[
-        df["title"].str.lower() == song_title.lower()
+        df["title"].str.lower()
+        == song_title.lower()
     ].tolist()
 
     if not matches:
@@ -44,34 +56,125 @@ def get_recommendations(df, song_title, number_of_recommendations=5):
 
     song_index = matches[0]
 
-    similarity_scores = list(
-        enumerate(similarity_matrix[song_index])
+
+    # ------------------------------------------
+    # Calculate audio similarity
+    # ------------------------------------------
+
+    feature_matrix = prepare_audio_features(df)
+
+    similarity_matrix = cosine_similarity(
+        feature_matrix
     )
 
-    # Sort by similarity score
-    similarity_scores = sorted(
-        similarity_scores,
-        key=lambda x: x[1],
-        reverse=True
-    )
-
-    # Remove the selected song itself
-    similarity_scores = [
-        item for item in similarity_scores
-        if item[0] != song_index
+    audio_scores = similarity_matrix[
+        song_index
     ]
 
-    top_songs = similarity_scores[:number_of_recommendations]
 
-    recommended_indices = [item[0] for item in top_songs]
-    recommended_scores = [item[1] for item in top_songs]
+    # ------------------------------------------
+    # Create recommendation dataframe
+    # ------------------------------------------
 
-    recommendations = df.iloc[recommended_indices].copy()
+    recommendations = df.copy()
 
-    recommendations["similarity"] = recommended_scores
+    recommendations["audio_similarity"] = (
+        audio_scores
+    )
+
+
+    # ------------------------------------------
+    # Genre similarity
+    # ------------------------------------------
+
+    selected_genre = df.loc[
+        song_index,
+        "genre"
+    ]
+
+    recommendations["genre_score"] = (
+        recommendations["genre"]
+        == selected_genre
+    ).astype(float)
+
+
+    # ------------------------------------------
+    # Artist similarity
+    # ------------------------------------------
+
+    selected_artist = df.loc[
+        song_index,
+        "artist"
+    ]
+
+    recommendations["artist_score"] = (
+        recommendations["artist"]
+        == selected_artist
+    ).astype(float)
+
+
+    # ------------------------------------------
+    # Combined recommendation score
+    # ------------------------------------------
+
+    recommendations["score"] = (
+
+        recommendations["audio_similarity"] * 0.70
+
+        + recommendations["genre_score"] * 0.20
+
+        + recommendations["artist_score"] * 0.10
+
+    )
+
+
+    # ------------------------------------------
+    # Remove selected song
+    # ------------------------------------------
+
+    recommendations = recommendations[
+        recommendations.index != song_index
+    ]
+
+
+    # ------------------------------------------
+    # Same genre filter
+    # ------------------------------------------
+
+    if same_genre_only:
+
+        recommendations = recommendations[
+            recommendations["genre"]
+            == selected_genre
+        ]
+
+
+    # ------------------------------------------
+    # Sort recommendations
+    # ------------------------------------------
+
+    recommendations = recommendations.sort_values(
+        by="score",
+        ascending=False
+    )
+
+
+    # ------------------------------------------
+    # Get top recommendations
+    # ------------------------------------------
+
+    recommendations = recommendations.head(
+        number_of_recommendations
+    )
+
+
+    # ------------------------------------------
+    # Convert score to percentage
+    # ------------------------------------------
 
     recommendations["similarity"] = (
-        recommendations["similarity"] * 100
-    ).round(2)
+        recommendations["score"] * 100
+    ).clip(0, 100).round(2)
+
 
     return recommendations
