@@ -253,20 +253,8 @@ else:
             number_of_recommendations
             same_genre_only
         )
+
         
-
-        # --------------------------------------------------
-        # GENRE FILTER FOR RECOMMENDATIONS
-        # --------------------------------------------------
-
-        if selected_genre != "All":
-
-            recommendations = recommendations[
-                recommendations["genre"]
-                == selected_genre
-            ]
-
-
         # --------------------------------------------------
         # DISPLAY RESULTS
         # --------------------------------------------------
