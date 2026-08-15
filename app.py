@@ -476,6 +476,10 @@ with recommendation_tab:
         use_container_width=True
     ):
 
+        # ------------------------------------------
+        # GET RECOMMENDATIONS
+        # ------------------------------------------
+
         recommendations = get_recommendations(
             df,
             selected_song,
@@ -483,114 +487,143 @@ with recommendation_tab:
             same_genre_only
         )
 
-    # ------------------------------------------
-    # SORT RECOMMENDATIONS
-    # ------------------------------------------
+        # ------------------------------------------
+        # CHECK RESULTS
+        # ------------------------------------------
 
-    sort_columns = {
-        "Similarity": "similarity",
-        "Energy": "energy",
-        "Danceability": "danceability",
-        "Valence": "valence",
-        "Year": "year"
-    }
+        if recommendations.empty:
 
-    sort_column = sort_columns[sort_option]
+            st.warning(
+                "No similar songs found."
+            )
 
-    recommendations = recommendations.sort_values(
-        by=sort_column,
-        ascending=False
-    )
+        else:
 
-    recommendations = recommendations.head(
-        number_of_recommendations
-    )
+            # --------------------------------------
+            # SORT RECOMMENDATIONS
+            # --------------------------------------
 
-    # ------------------------------------------
-    # DISPLAY RESULTS
-    # ------------------------------------------
+            sort_columns = {
+                "Similarity": "similarity",
+                "Energy": "energy",
+                "Danceability": "danceability",
+                "Valence": "valence",
+                "Year": "year"
+            }
 
-    if recommendations.empty:
+            sort_column = sort_columns[sort_option]
 
-        st.warning(
-            "No similar songs found."
-        )
-
-    else:
-
-        st.success(
-            f"🎧 Songs similar to **{selected_song}**"
-        )
-
-        for _, song in recommendations.iterrows():
-
-            col1, col2 = st.columns([5, 1])
-
-            with col1:
-
-                st.markdown(
-                    f"""
-                    <div class="song-card">
-
-                    <h3>
-                    🎵 {song['title']}
-                    </h3>
-
-                    <p>
-                    <b>Artist:</b>
-                    {song['artist']}
-                    </p>
-
-                    <p>
-                    <b>Genre:</b>
-                    {song['genre']}
-                    </p>
-
-                    <p>
-                    <b>Similarity:</b>
-                    {song['similarity']}%
-                    </p>
-
-                    </div>
-                    """,
-                    unsafe_allow_html=True
+            recommendations = (
+                recommendations
+                .sort_values(
+                    by=sort_column,
+                    ascending=False
                 )
+                .head(
+                    number_of_recommendations
+                )
+            )
 
-            with col2:
+            # --------------------------------------
+            # DISPLAY RESULTS
+            # --------------------------------------
 
-                if st.button(
-                    "❤️ Add",
-                    key=f"favorite_{song['title']}"
-                ):
+            st.success(
+                f"🎧 Songs similar to **{selected_song}**"
+            )
 
-                    song_data = {
-                        "title": song["title"],
-                        "artist": song["artist"],
-                        "genre": song["genre"],
-                        "year": song["year"]
-                    }
+            for _, song in recommendations.iterrows():
 
-                    existing_titles = [
-                        item["title"]
-                        for item in st.session_state.favorites
-                    ]
+                col1, col2 = st.columns([5, 1])
 
-                    if song["title"] not in existing_titles:
+                # ----------------------------------
+                # SONG CARD
+                # ----------------------------------
 
-                        st.session_state.favorites.append(
-                            song_data
-                        )
+                with col1:
 
-                        st.success(
-                            f"❤️ {song['title']} added!"
-                        )
+                    st.markdown(
+                        f"""
+                        <div class="song-card">
 
-                    else:
+                        <h3>
+                        🎵 {song['title']}
+                        </h3>
 
-                        st.info(
-                            "This song is already in your playlist."
-                        )
+                        <p>
+                        <b>Artist:</b>
+                        {song['artist']}
+                        </p>
 
+                        <p>
+                        <b>Genre:</b>
+                        {song['genre']}
+                        </p>
+
+                        <p>
+                        <b>Year:</b>
+                        {int(song['year'])}
+                        </p>
+
+                        <p>
+                        <b>Similarity:</b>
+                        {song['similarity']}%
+                        </p>
+
+                        <p>
+                        <b>Energy:</b>
+                        {round(song['energy'], 2)}
+                        </p>
+
+                        <p>
+                        <b>Danceability:</b>
+                        {round(song['danceability'], 2)}
+                        </p>
+
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+
+                # ----------------------------------
+                # ADD TO PLAYLIST
+                # ----------------------------------
+
+                with col2:
+
+                    if st.button(
+                        "❤️ Add",
+                        key=f"favorite_{song['title']}"
+                    ):
+
+                        song_data = {
+                            "title": song["title"],
+                            "artist": song["artist"],
+                            "genre": song["genre"],
+                            "year": song["year"]
+                        }
+
+                        existing_titles = [
+                            item["title"]
+                            for item in st.session_state.favorites
+                        ]
+
+                        if song["title"] not in existing_titles:
+
+                            st.session_state.favorites.append(
+                                song_data
+                            )
+
+                            st.success(
+                                f"❤️ {song['title']} added!"
+                            )
+
+                        else:
+
+                            st.info(
+                                "This song is already "
+                                "in your playlist."
+                            )
 # ==================================================
 # MOOD TAB
 # ==================================================
