@@ -248,3 +248,39 @@ def get_mood_recommendations(
     ).round(2)
 
     return recommendations
+
+# ==================================================
+# PLAYLIST MANAGEMENT
+# ==================================================
+
+def load_playlist(path):
+    """
+    Load saved playlist from CSV.
+    """
+
+    try:
+
+        playlist = pd.read_csv(path)
+
+        return playlist.to_dict(
+            orient="records"
+        )
+
+    except FileNotFoundError:
+
+        return []
+
+
+def save_playlist(path, favorites):
+    """
+    Save playlist to CSV.
+    """
+
+    playlist_df = pd.DataFrame(
+        favorites
+    )
+
+    playlist_df.to_csv(
+        path,
+        index=False
+    )
