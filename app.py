@@ -281,7 +281,16 @@ with recommendation_tab:
         max_value=10,
         value=5
     )
-
+    sort_option = st.selectbox(
+        "📊 Sort Recommendations By",
+        [
+            "Similarity",
+            "Energy",
+            "Danceability",
+            "Valence",
+            "Year"
+        ]
+    )
 
     # ----------------------------------------------
     # FILTER DATA
@@ -299,12 +308,62 @@ with recommendation_tab:
 
 
     # ----------------------------------------------
+    # SEARCH SONGS / ARTISTS
+    # ----------------------------------------------
+
+    search_query = st.text_input(
+        "🔎 Search Song or Artist",
+        placeholder="Type a song title or artist name..."
+    )
+
+
+    if search_query:
+
+        search_mask = (
+            filtered_df["title"]
+            .str.contains(
+                search_query,
+                case=False,
+                na=False
+            )
+            |
+            filtered_df["artist"]
+            .str.contains(
+                search_query,
+                case=False,
+                na=False
+            )
+        )
+
+        search_results = filtered_df[
+            search_mask
+        ]
+
+    else:
+
+        search_results = filtered_df
+
+
+    # ----------------------------------------------
+    # CHECK SEARCH RESULTS
+    # ----------------------------------------------
+
+    if search_results.empty:
+
+        st.warning(
+            "🔍 No songs or artists found."
+        )
+
+        st.stop()
+
+
+    # ----------------------------------------------
     # SONG SELECTOR
     # ----------------------------------------------
 
     selected_song = st.selectbox(
         "🎶 Choose a Song",
-        filtered_df["title"].tolist()
+        search_results["title"].tolist()
     )
 
 
@@ -409,23 +468,42 @@ with recommendation_tab:
 
 
     # ----------------------------------------------
-    # RECOMMEND
+    # RECOMMEND BUTTON
     # ----------------------------------------------
 
-    # ----------------------------------------------
-# RECOMMEND BUTTON
-# ----------------------------------------------
+    if st.button(
+        "🎵 Find Similar Songs",
+        use_container_width=True
+    ):
 
-if st.button(
-    "🎵 Find Similar Songs",
-    use_container_width=True
-):
+        recommendations = get_recommendations(
+            df,
+            selected_song,
+            50,
+            same_genre_only
+        )
 
-    recommendations = get_recommendations(
-        df,
-        selected_song,
-        number_of_recommendations,
-        same_genre_only
+    # ------------------------------------------
+    # SORT RECOMMENDATIONS
+    # ------------------------------------------
+
+    sort_columns = {
+        "Similarity": "similarity",
+        "Energy": "energy",
+        "Danceability": "danceability",
+        "Valence": "valence",
+        "Year": "year"
+    }
+
+    sort_column = sort_columns[sort_option]
+
+    recommendations = recommendations.sort_values(
+        by=sort_column,
+        ascending=False
+    )
+
+    recommendations = recommendations.head(
+        number_of_recommendations
     )
 
     # ------------------------------------------
