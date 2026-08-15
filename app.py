@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 
 from recommender import (
     load_data,
-    get_recommendations
+    get_recommendations,
+    get_mood_recommendations
 )
 
 
@@ -94,11 +95,34 @@ st.sidebar.write(
 # GENRE FILTER
 # --------------------------------------------------
 
-genres = ["All"] + sorted(df["genre"].unique().tolist())
+genres = [
+    "All"
+] + sorted(
+    df["genre"].unique().tolist()
+)
 
 selected_genre = st.sidebar.selectbox(
     "🎼 Select Genre",
     genres
+)
+
+
+# --------------------------------------------------
+# MOOD SELECTOR
+# --------------------------------------------------
+
+moods = [
+    "None",
+    "😌 Chill",
+    "⚡ Energetic",
+    "💃 Dance",
+    "😊 Happy",
+    "💔 Melancholy"
+]
+
+selected_mood = st.sidebar.selectbox(
+    "🎭 Choose a Mood",
+    moods
 )
 
 
@@ -115,7 +139,7 @@ number_of_recommendations = st.sidebar.slider(
 
 
 # ==================================================
-# FILTER DATA
+# FILTER DATA BY GENRE
 # ==================================================
 
 if selected_genre == "All":
@@ -133,11 +157,13 @@ else:
 # SONG SELECTION
 # ==================================================
 
-st.subheader("🎶 Choose a song")
+st.subheader("🎶 Choose a Song")
 
 if filtered_df.empty:
 
-    st.warning("No songs available for this genre.")
+    st.warning(
+        "No songs available for this genre."
+    )
 
 else:
 
@@ -158,7 +184,9 @@ else:
 
     st.subheader("🎵 Now Selected")
 
+
     col1, col2, col3, col4 = st.columns(4)
+
 
     with col1:
 
@@ -167,6 +195,7 @@ else:
             selected_data["artist"]
         )
 
+
     with col2:
 
         st.metric(
@@ -174,12 +203,14 @@ else:
             selected_data["genre"]
         )
 
+
     with col3:
 
         st.metric(
             "Release Year",
             int(selected_data["year"])
         )
+
 
     with col4:
 
@@ -193,10 +224,11 @@ else:
 
 
     # ==================================================
-    # FEATURE VISUALIZATION
+    # AUDIO FEATURES
     # ==================================================
 
     st.subheader("📊 Audio Features")
+
 
     features = [
         "danceability",
@@ -206,6 +238,7 @@ else:
         "valence"
     ]
 
+
     values = [
         selected_data[feature]
         for feature in features
@@ -214,50 +247,66 @@ else:
 
     fig, ax = plt.subplots()
 
+
     ax.bar(
         features,
         values
     )
 
-    ax.set_ylim(0, 1)
 
-    ax.set_ylabel("Value")
+    ax.set_ylim(
+        0,
+        1
+    )
+
+
+    ax.set_ylabel(
+        "Value"
+    )
+
 
     ax.set_title(
         f"Audio Features — {selected_song}"
     )
 
+
     plt.xticks(
         rotation=30
     )
+
 
     st.pyplot(fig)
 
 
     # ==================================================
-    # RECOMMEND BUTTON
+    # SIMILAR SONG RECOMMENDATIONS
     # ==================================================
+
+    st.divider()
+
+    st.subheader(
+        "🎧 Similar Songs"
+    )
+
 
     same_genre_only = st.checkbox(
         "🎼 Recommend only from the same genre"
     )
+
 
     if st.button(
         "🎵 Find Similar Songs",
         use_container_width=True
     ):
 
+
         recommendations = get_recommendations(
             df,
             selected_song,
-            number_of_recommendations
+            number_of_recommendations,
             same_genre_only
         )
 
-        
-        # --------------------------------------------------
-        # DISPLAY RESULTS
-        # --------------------------------------------------
 
         if recommendations.empty:
 
@@ -268,9 +317,14 @@ else:
         else:
 
             st.success(
-                f"🎧 Recommendations for **{selected_song}**"
+                f"🎧 Recommendations for "
+                f"**{selected_song}**"
             )
 
+
+            # ------------------------------------------
+            # SONG CARDS
+            # ------------------------------------------
 
             for _, song in recommendations.iterrows():
 
@@ -308,13 +362,14 @@ else:
                 )
 
 
-            # --------------------------------------------------
+            # ------------------------------------------
             # RECOMMENDATION TABLE
-            # --------------------------------------------------
+            # ------------------------------------------
 
             st.subheader(
                 "📋 Recommendation Summary"
             )
+
 
             display_df = recommendations[
                 [
@@ -344,16 +399,107 @@ else:
 
 
 # ==================================================
-# DATASET SECTION
+# MOOD-BASED RECOMMENDATIONS
 # ==================================================
 
 st.divider()
 
-st.subheader("📚 Explore Dataset")
+st.subheader(
+    "🎭 Mood-Based Recommendations"
+)
+
+
+if selected_mood == "None":
+
+    st.info(
+        "Choose a mood from the sidebar "
+        "to get mood-based recommendations."
+    )
+
+
+else:
+
+    if st.button(
+        f"🎵 Find {selected_mood} Songs",
+        use_container_width=True
+    ):
+
+        mood_recommendations = (
+            get_mood_recommendations(
+                df,
+                selected_mood,
+                number_of_recommendations
+            )
+        )
+
+
+        if mood_recommendations.empty:
+
+            st.warning(
+                "No mood recommendations found."
+            )
+
+
+        else:
+
+            st.success(
+                f"Songs matching the "
+                f"{selected_mood} mood"
+            )
+
+
+            # ------------------------------------------
+            # MOOD SONG CARDS
+            # ------------------------------------------
+
+            for _, song in (
+                mood_recommendations.iterrows()
+            ):
+
+                st.markdown(
+                    f"""
+                    <div class="song-card">
+
+                    <h3>
+                    🎵 {song['title']}
+                    </h3>
+
+                    <p>
+                    <b>Artist:</b>
+                    {song['artist']}
+                    </p>
+
+                    <p>
+                    <b>Genre:</b>
+                    {song['genre']}
+                    </p>
+
+                    <p>
+                    <b>Mood Match:</b>
+                    {song['mood_match']}%
+                    </p>
+
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+
+
+# ==================================================
+# DATASET
+# ==================================================
+
+st.divider()
+
+st.subheader(
+    "📚 Explore Dataset"
+)
+
 
 st.write(
     f"Total songs in dataset: **{len(df)}**"
 )
+
 
 st.dataframe(
     df,
@@ -368,7 +514,10 @@ st.dataframe(
 
 st.divider()
 
-st.subheader("🧠 How TuneMatch Works")
+st.subheader(
+    "🧠 How TuneMatch Works"
+)
+
 
 st.write(
     """
@@ -385,7 +534,11 @@ st.write(
     These features are standardized using Scikit-learn's
     StandardScaler and compared using cosine similarity.
 
-    Songs with more similar feature patterns receive
-    higher similarity scores.
+    TuneMatch also considers genre and artist similarity
+    when calculating recommendation scores.
+
+    Mood recommendations are generated by analyzing
+    characteristics such as energy, danceability,
+    acousticness, and valence.
     """
 )
