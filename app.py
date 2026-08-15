@@ -238,6 +238,10 @@ else:
     # RECOMMEND BUTTON
     # ==================================================
 
+    same_genre_only = st.checkbox(
+        "🎼 Recommend only from the same genre"
+    )
+
     if st.button(
         "🎵 Find Similar Songs",
         use_container_width=True
@@ -247,8 +251,9 @@ else:
             df,
             selected_song,
             number_of_recommendations
+            same_genre_only
         )
-
+        
 
         # --------------------------------------------------
         # GENRE FILTER FOR RECOMMENDATIONS
