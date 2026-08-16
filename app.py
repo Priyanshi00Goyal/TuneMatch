@@ -541,6 +541,10 @@ with recommendation_tab:
             )
 
             for _, song in recommendations.iterrows():
+                explanation = explain_recommendation(
+                selected_data,
+                song
+            )
 
                 col1, col2 = st.columns([5, 1])
 
