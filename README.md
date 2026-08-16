@@ -1,76 +1,162 @@
-# 🎵 TuneMatch
+# 🎵 TuneMatch — Personal Music Discovery Engine
 
 <p align="center">
 
-### 🎧 Your Personal Music Discovery Engine
+  <img src="https://img.shields.io/badge/Python-3.13-blue?style=for-the-badge&logo=python" alt="Python">
 
-A content-based music recommendation system that helps you discover songs based on **sound, mood, and musical characteristics.**
+  <img src="https://img.shields.io/badge/Streamlit-App-red?style=for-the-badge&logo=streamlit" alt="Streamlit">
 
-<br>
+  <img src="https://img.shields.io/badge/Pandas-Data%20Analysis-150458?style=for-the-badge&logo=pandas" alt="Pandas">
 
-![Python](https://img.shields.io/badge/Python-3.x-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![Streamlit](https://img.shields.io/badge/Streamlit-App-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)
-![Pandas](https://img.shields.io/badge/Pandas-Data%20Analysis-150458?style=for-the-badge&logo=pandas&logoColor=white)
-![Scikit Learn](https://img.shields.io/badge/Scikit--learn-ML-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white)
-![Matplotlib](https://img.shields.io/badge/Matplotlib-Visualization-11557C?style=for-the-badge)
+  <img src="https://img.shields.io/badge/Matplotlib-Visualization-11557c?style=for-the-badge&logo=matplotlib" alt="Matplotlib">
+
+</p>
+
+<p align="center">
+
+  <strong>🎧 Discover music that matches your taste, mood, and listening personality.</strong>
+
+</p>
+
+<p align="center">
+
+  <a href="https://tunematch-8y24ejjnpcfqykac8diw79.streamlit.app/">
+    🚀 Live Demo
+  </a>
 
 </p>
 
 ---
 
-## 🌟 Overview
+## 📌 About The Project
 
-**TuneMatch** is a Python-based music recommendation application designed to make music discovery more personalized.
+**TuneMatch** is a content-based music recommendation system built with Python and Streamlit.
 
-Instead of recommending songs randomly, TuneMatch analyzes the **musical characteristics** of songs and finds tracks with similar audio profiles.
+The application analyzes musical characteristics such as:
 
-The application combines:
+- 🎵 Energy
+- 💃 Danceability
+- 🎹 Acousticness
+- 🎼 Instrumentalness
+- 😊 Valence
+- 🎤 Artist
+- 🎼 Genre
+- 📅 Release Year
 
-- 🎧 Content-based recommendation
-- 🎭 Mood-based discovery
-- 🔎 Song & artist search
-- 🎼 Genre filtering
-- ❤️ Personal playlists
-- 👤 Music personality analysis
-- 📊 Music analytics
-- 🧠 Explainable recommendations
+Using these characteristics, TuneMatch recommends songs with similar musical profiles and also provides mood-based music discovery.
 
-All inside an interactive **Streamlit web application**.
+The project combines **data analysis, recommendation algorithms, visualization, and an interactive web interface** into one application.
 
 ---
 
-# 🎬 What Can TuneMatch Do?
+# ✨ Features
 
-| Feature | Description |
+## 🎧 Song Recommendations
+
+Select a song and discover tracks with similar musical characteristics.
+
+TuneMatch considers audio features such as:
+
+- Energy
+- Danceability
+- Acousticness
+- Instrumentalness
+- Valence
+
+You can also:
+
+- Filter recommendations by genre
+- Search songs by title or artist
+- Choose the number of recommendations
+- Sort recommendations by similarity
+- Sort by energy
+- Sort by danceability
+- Sort by valence
+- Sort by release year
+
+---
+
+## 🎭 Mood-Based Discovery
+
+Choose your current mood and discover suitable songs.
+
+Available moods include:
+
+| Mood | Description |
 |---|---|
-| 🎧 Recommendations | Find songs similar to your selected track |
-| 🎭 Mood Discovery | Discover songs according to your mood |
-| 🔎 Search | Search songs and artists instantly |
-| 🎼 Genre Filter | Explore music by genre |
-| 📊 Sorting | Sort recommendations by similarity, energy, danceability, valence or year |
-| ❤️ Playlist | Create and manage your personal playlist |
-| 💾 Persistence | Save playlists locally |
-| 👤 Music Profile | Analyze your personal music taste |
-| 🧠 Explainability | Understand why a song was recommended |
-| 📈 Analytics | Explore patterns in the music dataset |
+| 😌 Chill | Calm and relaxing music |
+| ⚡ Energetic | High-energy tracks |
+| 💃 Dance | Dance-oriented songs |
+| 😊 Happy | Positive and uplifting music |
+| 💔 Melancholy | Emotional and mellow tracks |
 
 ---
 
-# 🧠 How TuneMatch Works
+## ❤️ Personal Playlist
 
-TuneMatch follows a **content-based recommendation approach**.
+Users can create their own playlist directly inside the application.
 
-Each song is represented using numerical audio characteristics.
+Features include:
 
-### 🎵 Audio Features
+- ❤️ Add songs
+- 🗑️ Remove songs
+- 💾 Save playlist
+- 📥 Export playlist as CSV
+- 🔄 Persistent playlist storage
+
+---
+
+## 👤 Music Profile
+
+TuneMatch analyzes the user's saved playlist and generates a personalized music profile.
+
+The profile includes:
+
+- 🎼 Favorite Genre
+- ⚡ Average Energy
+- 💃 Average Danceability
+- 🎹 Average Acousticness
+- 😊 Average Valence
+
+The application also generates a simple **Music Personality** based on the user's listening characteristics.
+
+---
+
+## 📊 Music Analytics
+
+The Analytics dashboard provides insights into the dataset.
+
+It includes:
+
+- 🎼 Genre Distribution
+- ⚡ Average Energy by Genre
+- 💃 Average Danceability by Genre
+- 😊 Average Valence by Genre
+- 📅 Songs by Release Year
+- ⚡ Most Energetic Songs
+- 💃 Most Danceable Songs
+
+---
+
+# 🧠 Recommendation System
+
+TuneMatch uses a **content-based recommendation approach**.
+
+Instead of relying on other users' listening history, the system compares the characteristics of songs.
+
+The recommendation process can be summarized as:
 
 ```text
-┌───────────────────────────────┐
-│        Song Features          │
-├───────────────────────────────┤
-│ 💃 Danceability               │
-│ ⚡ Energy                     │
-│ 🎹 Acousticness               │
-│ 🎼 Instrumentalness            │
-│ 😊 Valence                    │
-└───────────────────────────────┘
+User selects a song
+        ↓
+Extract audio features
+        ↓
+Compare with other songs
+        ↓
+Calculate similarity
+        ↓
+Apply optional genre filtering
+        ↓
+Rank recommendations
+        ↓
+Display similar songs
