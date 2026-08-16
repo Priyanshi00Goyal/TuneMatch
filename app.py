@@ -131,12 +131,13 @@ st.sidebar.metric(
 # NAVIGATION
 # ==================================================
 
-home_tab, recommendation_tab, mood_tab, playlist_tab, analytics_tab = st.tabs(
+home_tab, recommendation_tab, mood_tab, playlist_tab, profile_tab, analytics_tab = st.tabs(
     [
         "🏠 Home",
         "🎧 Recommendations",
         "🎭 Mood",
         "❤️ My Playlist",
+        "👤 My Profile",
         "📊 Analytics"
     ]
 )
@@ -829,6 +830,241 @@ with playlist_tab:
             use_container_width=True
         )
 
+
+# ==================================================
+# PROFILE TAB
+# ==================================================
+
+with profile_tab:
+
+    st.header("👤 My Music Profile")
+
+    st.write(
+        "Discover what your playlist says about your music taste."
+    )
+
+    # ----------------------------------------------
+    # CHECK PLAYLIST
+    # ----------------------------------------------
+
+    if not st.session_state.favorites:
+
+        st.info(
+            "❤️ Your playlist is empty."
+        )
+
+        st.write(
+            "Add some songs from the Recommendations tab "
+            "to generate your music profile."
+        )
+
+    else:
+
+        # ------------------------------------------
+        # CONVERT PLAYLIST TO DATAFRAME
+        # ------------------------------------------
+
+        playlist_df = pd.DataFrame(
+            st.session_state.favorites
+        )
+
+        # ------------------------------------------
+        # MATCH PLAYLIST WITH DATASET
+        # ------------------------------------------
+
+        profile_df = df[
+            df["title"].isin(
+                playlist_df["title"]
+            )
+        ].copy()
+
+        if profile_df.empty:
+
+            st.warning(
+                "Could not find playlist songs "
+                "in the dataset."
+            )
+
+        else:
+
+            # --------------------------------------
+            # PROFILE METRICS
+            # --------------------------------------
+
+            favorite_genre = (
+                profile_df["genre"]
+                .value_counts()
+                .idxmax()
+            )
+
+            average_energy = (
+                profile_df["energy"].mean()
+            )
+
+            average_danceability = (
+                profile_df["danceability"].mean()
+            )
+
+            average_acousticness = (
+                profile_df["acousticness"].mean()
+            )
+
+            average_valence = (
+                profile_df["valence"].mean()
+            )
+
+            # --------------------------------------
+            # DISPLAY METRICS
+            # --------------------------------------
+
+            st.subheader(
+                "🎵 Your Music Statistics"
+            )
+
+            col1, col2, col3, col4, col5 = st.columns(5)
+
+            with col1:
+
+                st.metric(
+                    "🎼 Favorite Genre",
+                    favorite_genre
+                )
+
+            with col2:
+
+                st.metric(
+                    "⚡ Avg Energy",
+                    f"{average_energy:.2f}"
+                )
+
+            with col3:
+
+                st.metric(
+                    "💃 Danceability",
+                    f"{average_danceability:.2f}"
+                )
+
+            with col4:
+
+                st.metric(
+                    "🎹 Acousticness",
+                    f"{average_acousticness:.2f}"
+                )
+
+            with col5:
+
+                st.metric(
+                    "😊 Valence",
+                    f"{average_valence:.2f}"
+                )
+
+            st.divider()
+
+            # --------------------------------------
+            # MUSIC PERSONALITY
+            # --------------------------------------
+
+            st.subheader(
+                "🧠 Your Music Personality"
+            )
+
+            if (
+                average_energy >= 0.7
+                and average_danceability >= 0.7
+            ):
+
+                personality = (
+                    "⚡ You enjoy energetic and "
+                    "danceable music."
+                )
+
+            elif average_energy >= 0.7:
+
+                personality = (
+                    "🔥 Your playlist has a "
+                    "high-energy vibe."
+                )
+
+            elif average_acousticness >= 0.6:
+
+                personality = (
+                    "🎹 You seem to enjoy "
+                    "acoustic and mellow sounds."
+                )
+
+            elif average_valence >= 0.7:
+
+                personality = (
+                    "😊 Your playlist has a "
+                    "positive and uplifting vibe."
+                )
+
+            elif average_valence <= 0.35:
+
+                personality = (
+                    "🌙 Your playlist leans toward "
+                    "calm and emotional music."
+                )
+
+            else:
+
+                personality = (
+                    "🎧 Your music taste is "
+                    "nicely balanced."
+                )
+
+            st.success(
+                personality
+            )
+
+            # --------------------------------------
+            # AUDIO PROFILE CHART
+            # --------------------------------------
+
+            st.subheader(
+                "📊 Your Audio Profile"
+            )
+
+            profile_features = [
+                "Energy",
+                "Danceability",
+                "Acousticness",
+                "Valence"
+            ]
+
+            profile_values = [
+                average_energy,
+                average_danceability,
+                average_acousticness,
+                average_valence
+            ]
+
+            fig, ax = plt.subplots()
+
+            ax.bar(
+                profile_features,
+                profile_values
+            )
+
+            ax.set_ylim(
+                0,
+                1
+            )
+
+            ax.set_ylabel(
+                "Average Value"
+            )
+
+            ax.set_title(
+                "Your Music Characteristics"
+            )
+
+            plt.xticks(
+                rotation=20
+            )
+
+            st.pyplot(fig)
+            
         
 # ==================================================
 # ANALYTICS TAB
