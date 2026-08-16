@@ -152,6 +152,123 @@ def get_recommendations(
 
 
 # ==================================================
+# RECOMMENDATION EXPLANATION
+# ==================================================
+
+def explain_recommendation(
+    selected_song_data,
+    recommended_song
+):
+    """
+    Explain why a song was recommended.
+    """
+
+    explanations = []
+
+    # ----------------------------------------------
+    # ENERGY
+    # ----------------------------------------------
+
+    energy_difference = abs(
+        selected_song_data["energy"]
+        - recommended_song["energy"]
+    )
+
+    if energy_difference <= 0.10:
+
+        explanations.append(
+            "similar energy"
+        )
+
+    elif recommended_song["energy"] > selected_song_data["energy"]:
+
+        explanations.append(
+            "higher energy"
+        )
+
+    else:
+
+        explanations.append(
+            "lower energy"
+        )
+
+    # ----------------------------------------------
+    # DANCEABILITY
+    # ----------------------------------------------
+
+    dance_difference = abs(
+        selected_song_data["danceability"]
+        - recommended_song["danceability"]
+    )
+
+    if dance_difference <= 0.10:
+
+        explanations.append(
+            "similar danceability"
+        )
+
+    # ----------------------------------------------
+    # ACOUSTICNESS
+    # ----------------------------------------------
+
+    acoustic_difference = abs(
+        selected_song_data["acousticness"]
+        - recommended_song["acousticness"]
+    )
+
+    if acoustic_difference <= 0.10:
+
+        explanations.append(
+            "similar acousticness"
+        )
+
+    # ----------------------------------------------
+    # VALENCE
+    # ----------------------------------------------
+
+    valence_difference = abs(
+        selected_song_data["valence"]
+        - recommended_song["valence"]
+    )
+
+    if valence_difference <= 0.10:
+
+        explanations.append(
+            "similar mood"
+        )
+
+    # ----------------------------------------------
+    # GENRE
+    # ----------------------------------------------
+
+    if (
+        selected_song_data["genre"]
+        == recommended_song["genre"]
+    ):
+
+        explanations.append(
+            "same genre"
+        )
+
+    # ----------------------------------------------
+    # CREATE EXPLANATION
+    # ----------------------------------------------
+
+    if not explanations:
+
+        return (
+            "This song has a similar overall "
+            "audio profile."
+        )
+
+    return (
+        "Recommended because of "
+        + ", ".join(explanations)
+        + "."
+    )
+
+
+# ==================================================
 # MOOD SCORE
 # ==================================================
 
