@@ -31,29 +31,72 @@ st.markdown(
     """
     <style>
 
-    .main-title {
-        font-size: 52px;
-        font-weight: 800;
-        text-align: center;
-        margin-bottom: 0px;
+    /* Main background */
+    .stApp {
+        background: linear-gradient(
+            135deg,
+            #f8f9ff 0%,
+            #eef1ff 100%
+        );
     }
 
+    /* Main title */
+    .main-title {
+        font-size: 58px;
+        font-weight: 800;
+        text-align: center;
+        margin-top: 10px;
+        margin-bottom: 5px;
+    }
+
+    /* Subtitle */
     .subtitle {
         text-align: center;
         font-size: 20px;
-        margin-bottom: 30px;
+        margin-bottom: 35px;
+        opacity: 0.75;
     }
 
+    /* Song cards */
     .song-card {
-        padding: 20px;
-        border-radius: 15px;
+        padding: 22px;
+        border-radius: 18px;
         border: 1px solid #dddddd;
         margin-bottom: 15px;
+        background: rgba(255, 255, 255, 0.85);
+        box-shadow: 0px 5px 15px rgba(0,0,0,0.06);
+        transition: 0.2s;
     }
 
+    .song-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0px 8px 20px rgba(0,0,0,0.10);
+    }
+
+    /* Section titles */
     .section-title {
         font-size: 28px;
         font-weight: 700;
+    }
+
+    /* Buttons */
+    .stButton > button {
+        border-radius: 12px;
+        font-weight: 600;
+        padding: 8px 18px;
+    }
+
+    /* Metrics */
+    [data-testid="stMetric"] {
+        background: rgba(255,255,255,0.75);
+        padding: 15px;
+        border-radius: 15px;
+        border: 1px solid #dddddd;
+    }
+
+    /* Sidebar */
+    [data-testid="stSidebar"] {
+        background: rgba(255,255,255,0.9);
     }
 
     </style>
@@ -127,6 +170,16 @@ st.sidebar.metric(
     df["genre"].nunique()
 )
 
+st.sidebar.divider()
+
+st.sidebar.success(
+    "🟢 TuneMatch Engine Online"
+)
+
+st.sidebar.caption(
+    "Content-based recommendation system"
+)
+
 
 # ==================================================
 # NAVIGATION
@@ -152,11 +205,16 @@ with home_tab:
 
     st.header("🏠 Welcome to TuneMatch")
 
+    st.info(
+        "🎵 Discover music based on sound, mood and your personal taste."
+    )
+
     st.write(
         """
-        TuneMatch is a content-based music recommendation
-        system that analyzes musical characteristics to
-        discover songs that sound similar.
+        TuneMatch is an intelligent content-based music discovery
+        system that analyzes audio characteristics such as energy,
+        danceability, acousticness and valence to recommend songs
+        you'll love.
         """
     )
 
@@ -433,6 +491,13 @@ with recommendation_tab:
         "instrumentalness",
         "valence"
     ]
+    weights = {
+        "danceability": 1.2,
+        "energy": 1.2,
+        "acousticness": 1.0,
+        "instrumentalness": 0.8,
+        "valence": 1.1
+    }
 
     values = [
         selected_data[feature]
