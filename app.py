@@ -7,7 +7,8 @@ from recommender import (
     get_recommendations,
     get_mood_recommendations,
     load_playlist,
-    save_playlist
+    save_playlist,
+    explain_recommendation
 )
 
 
@@ -587,6 +588,11 @@ with recommendation_tab:
                         {round(song['danceability'], 2)}
                         </p>
 
+                        <p>
+                        <b>🧠 Why this song?</b>
+                        {explanation}
+                        </p>
+
                         </div>
                         """,
                         unsafe_allow_html=True
@@ -696,6 +702,10 @@ with mood_tab:
         for _, song in (
             mood_recommendations.iterrows()
         ):
+            explanation = explain_recommendation(
+                selected_data,
+                song
+            )
 
             st.markdown(
                 f"""
@@ -1064,7 +1074,7 @@ with profile_tab:
             )
 
             st.pyplot(fig)
-            
+
         
 # ==================================================
 # ANALYTICS TAB
