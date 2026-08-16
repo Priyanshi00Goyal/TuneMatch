@@ -23,22 +23,8 @@ from pathlib import Path
 # DATA / FILE CONFIGURATION
 # ==================================================
 
-BASE_DIR = Path(__file__).resolve().parent
-
-PLAYLIST_PATH = str(BASE_DIR / "playlist.json")
-
-# Automatically find CSV file in the TuneMatch folder
-csv_files = list(BASE_DIR.glob("*.csv"))
-
-if not csv_files:
-    st.error(
-        "❌ No CSV dataset found!\n\n"
-        f"Please put your dataset CSV file inside:\n"
-        f"{BASE_DIR}"
-    )
-    st.stop()
-
-DATA_PATH = str(csv_files[0])
+DATA_PATH = "data/songs.csv"
+PLAYLIST_PATH = "data/playlist.csv"
 
 # Load dataset
 df = load_data(DATA_PATH)
