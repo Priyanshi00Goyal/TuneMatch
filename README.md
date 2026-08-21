@@ -138,6 +138,25 @@ It includes:
 
 ---
 
+## 📸 App Screenshots
+
+### 🏠 Home
+![TuneMatch Home](screenshots/home.png)
+
+### 🐾 Navigation
+![TuneMatch_Navigation](screenshots/navigation.png)
+
+### 🎵 Recommendations
+![TuneMatch Recommendations](screenshots/recommendations.png)
+
+### 😊 Mood Recommendations
+![TuneMatch Mood](screenshots/mood.png)
+
+### 📊 Analytics
+![TuneMatch Analytics](screenshots/analytics.png)
+
+---
+
 # 🧠 Recommendation System
 
 TuneMatch uses a **content-based recommendation approach**.
